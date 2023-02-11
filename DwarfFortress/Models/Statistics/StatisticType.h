@@ -4,5 +4,5 @@ enum StatisticType {
     // Permanent Effects
     Damage, Armor, Health, 
     // Immediate Effects
-    HealthRestore 
-}
+    HealthRestore = 128
+};

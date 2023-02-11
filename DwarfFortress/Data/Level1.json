@@ -1,0 +1,29 @@
+{
+  "Player": {
+    "Position": [10, 10],
+    "Health": 100,
+    "Items": []
+  },
+  "NonPlayableCharacters": {
+    "Enemies": [{
+      "Position": [20, 20],
+      "Health": 100,
+      "Items": []
+    }]
+  },
+  "Items": [{
+    "Position": [30, 10],
+    "Statistics": [{
+      "StatisticType": 128,
+      "Value": 20
+    }]
+  }],
+  "Rooms": [{
+    "From": [0, 0],
+    "To":   [118, 28]
+  }, {
+    "From": [20, 0],
+    "To":   [50, 10],
+    "EntryPoint": 2
+  }]
+}

@@ -1,6 +1,25 @@
+#include <boost/signals2.hpp>
+#include <boost/bind.hpp>
 
-int main(int argc, char* argv[])
+#include "Controllers/KeyboardController.h"
+#include "Externals/json/json.h"
+#include "Models/Environment.h"
+#include "Utilities/LevelLoader.h"
+#include "Views/View.h"
+
+using namespace boost;
+using namespace std;
+
+int main()
 {
+    LevelLoader levelLoader("Data/Level1.json");
+    std::shared_ptr<Environment> environment = std::make_shared<Environment>(Coordinates {119, 29}, levelLoader.LoadedObjects, levelLoader.LoadedRooms);
+    View view(environment);
+    KeyboardController keyboardController;
+
+    environment->SignalEnvironmentChanged.connect(bind(&View::Draw, &view));
+    keyboardController.SignalKeyboardPress.connect(bind(&Environment::MoveTick, environment, _1));
+    keyboardController.ListenToInputs();
     
     return 0;
 }

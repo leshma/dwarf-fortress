@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Object.h"
 
-class NonPlayableCharacter : Object
+class NonPlayableCharacter : public Object
 {
 public:
     

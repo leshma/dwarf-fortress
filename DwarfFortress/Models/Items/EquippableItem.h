@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "Item.h"
-#include "Models/Statistics/Statistic.h"
+#include "../Statistics/Statistic.h"
 
 class EquippableItem : Item
 {

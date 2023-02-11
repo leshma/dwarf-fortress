@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "View.h"
 
-class GameView : View
+class GameView : public View
 {
 public:
     

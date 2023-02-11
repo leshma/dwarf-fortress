@@ -78,6 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -109,10 +110,12 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_81_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_81_0\bin\$(PlatformTarget)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -156,6 +159,9 @@
   <ItemGroup>
     <ClCompile Include="Controllers\KeyboardController.cpp" />
     <ClCompile Include="DwarfFortress.cpp" />
+    <ClCompile Include="Externals\jsoncpp.cpp" />
+    <ClCompile Include="Models\Coordinates.cpp" />
+    <ClCompile Include="Models\Door.cpp" />
     <ClCompile Include="Models\Enemy.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -726,6 +732,7 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Models\Room.cpp" />
     <ClCompile Include="Models\Statistics\ConsumableStatistic.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -897,6 +904,9 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Models\Wall.cpp" />
+    <ClCompile Include="Utilities\LevelLoader.cpp" />
+    <ClCompile Include="ViewModels\Change.cpp" />
     <ClCompile Include="Views\GameView.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1071,7 +1081,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controllers\KeyboardController.h" />
+    <ClInclude Include="Externals\json\json-forwards.h" />
+    <ClInclude Include="Externals\json\json.h" />
+    <ClInclude Include="Models\Coordinates.h" />
+    <ClInclude Include="Models\Door.h" />
     <ClInclude Include="Models\Enemy.h" />
+    <ClInclude Include="Models\EntryPoint.h" />
     <ClInclude Include="Models\Environment.h" />
     <ClInclude Include="Models\Inventory.h" />
     <ClInclude Include="Models\Items\Armor.h" />
@@ -1080,14 +1095,22 @@
     <ClInclude Include="Models\Items\Weapon.h" />
     <ClInclude Include="Models\NonPlayableCharacter.h" />
     <ClInclude Include="Models\Object.h" />
+    <ClInclude Include="Models\ObjectType.h" />
     <ClInclude Include="Models\Player.h" />
+    <ClInclude Include="Models\Room.h" />
     <ClInclude Include="Models\Statistics\ConsumableStatistic.h" />
     <ClInclude Include="Models\Statistics\PermanentStatistic.h" />
     <ClInclude Include="Models\Statistics\Statistic.h" />
     <ClInclude Include="Models\Statistics\StatisticType.h" />
+    <ClInclude Include="Models\Wall.h" />
+    <ClInclude Include="Utilities\LevelLoader.h" />
+    <ClInclude Include="ViewModels\Change.h" />
     <ClInclude Include="Views\GameView.h" />
     <ClInclude Include="Views\MenuView.h" />
     <ClInclude Include="Views\View.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\Level1.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
