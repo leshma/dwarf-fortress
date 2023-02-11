@@ -27,6 +27,7 @@ public:
 
         Objects = std::vector<std::vector<std::tuple<char, int>>>(Dimensions.Y, std::vector<std::tuple<char, int>>(Dimensions.X, std::tuple<char, int>(' ', BACKGROUND_GREEN)));
         for (int y = 0; y < Environment->Objects.size(); ++y)
+        {
             for (int x = 0; x < Environment->Objects[y].size(); ++x)
             {
                 if (Environment->Objects[y][x] != nullptr)
@@ -34,42 +35,23 @@ public:
                     {
                         case TWall:
                             Objects[y][x] = std::tuple<char, int>(' ', FOREGROUND_GREEN | BACKGROUND_RED | BACKGROUND_INTENSITY);
-                            break;
+                                break;
                         case TPlayer:
                             Objects[y][x] = std::tuple<char, int>('P', FOREGROUND_RED | BACKGROUND_RED | FOREGROUND_INTENSITY);
-                            break;
+                                break;
                         case TDoor:
                             Objects[y][x] = std::tuple<char, int>(' ', BACKGROUND_GREEN);
-                            break;
+                                break;
                         default:
                             break;
                     }
             }
+        }
     }
 
     void Draw()
     {
-        for (int y = 0; y < Environment->Objects.size(); ++y)
-            for (int x = 0; x < Environment->Objects[y].size(); ++x)
-            {
-                if (Environment->Objects[y][x] != nullptr)
-                    switch (Environment->Objects[y][x]->GetType())
-                    {
-                        case TWall:
-                            Objects[y][x] = std::tuple<char, int>(' ', FOREGROUND_GREEN | BACKGROUND_RED | BACKGROUND_INTENSITY);
-                                break;
-                        case TPlayer:
-                            Objects[y][x] = std::tuple<char, int>('P', FOREGROUND_RED | BACKGROUND_RED | FOREGROUND_INTENSITY);
-                                break;
-                        case TDoor:
-                            Objects[y][x] = std::tuple<char, int>(' ', BACKGROUND_GREEN);
-                            break;
-                        default:
-                            Objects[y][x] = std::tuple<char, int>(' ', BACKGROUND_GREEN);
-                            break;
-                    }
-            }
-        
+        // Draw the game
         DWORD written;
         for (byte y = 0; y < Objects.size(); ++y)
         {
@@ -83,6 +65,40 @@ public:
                     1, COORD {x, y}, &written
                 );
             }
+        }
+
+        // Draw status
+        COORD statusPosition {0, 29};
+        SetConsoleCursorPosition(ConsoleScreenHandle, statusPosition);
+        std::cout << "Health: 100 | Damage: 20 | Armor: 5";
+    }
+
+    void DrawChanges(std::vector<Change> changes)
+    {
+        DWORD written;
+        for (const auto change : changes)
+        {
+            const std::tuple<char, int> temp = Objects[change.From.Y][change.From.X];
+            Objects[change.From.Y][change.From.X] = Objects[change.To.Y][change.To.X];
+            Objects[change.To.Y][change.To.X] = temp;
+
+            FillConsoleOutputCharacterA(
+                    ConsoleScreenHandle, std::get<0>(Objects[change.From.Y][change.From.X]), 1,
+                    COORD{static_cast<short>(change.From.X), static_cast<short>(change.From.Y)}, &written
+                );
+            FillConsoleOutputAttribute(
+                ConsoleScreenHandle, std::get<1>(Objects[change.From.Y][change.From.X]),
+                1, COORD {static_cast<short>(change.From.X), static_cast<short>(change.From.Y)}, &written
+            );
+
+            FillConsoleOutputCharacterA(
+                    ConsoleScreenHandle, std::get<0>(Objects[change.To.Y][change.To.X]), 1,
+                    COORD{static_cast<short>(change.To.X), static_cast<short>(change.To.Y)}, &written
+                );
+            FillConsoleOutputAttribute(
+                ConsoleScreenHandle, std::get<1>(Objects[change.To.Y][change.To.X]),
+                1, COORD {static_cast<short>(change.To.X), static_cast<short>(change.To.Y)}, &written
+            );
         }
     }
     

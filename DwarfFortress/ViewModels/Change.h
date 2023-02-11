@@ -6,5 +6,8 @@
 class Change
 {
 public:
-    std::shared_ptr<Object> Object;
+    Coordinates From;
+    Coordinates To;
+
+    Change(Coordinates from, Coordinates to) : From(from), To(to) {  }
 };

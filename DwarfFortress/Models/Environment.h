@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "Room.h"
 #include "Wall.h"
+#include "../ViewModels/Change.h"
 
 // This class is used to process and gather data about the environment.
 class Environment
@@ -21,7 +22,7 @@ public:
     Coordinates PlayerPosition;
     std::vector<Coordinates> EnemyPositions;
 
-    boost::signals2::signal<void ()> SignalEnvironmentChanged;
+    boost::signals2::signal<void (std::vector<Change>)> SignalEnvironmentChanged;
 
     Environment(Coordinates dimensions, std::vector<std::shared_ptr<Object>> environmentObjects,
         std::vector<std::shared_ptr<Room>> environmentRooms)
@@ -90,27 +91,78 @@ public:
 
     void MoveTick(WORD keyPressed)
     {
+        std::vector<Change> changes;
+        
+        int xMovement = 0, yMovement = 0;
         switch (keyPressed)
         {
             case VK_LEFT:
-                std::swap(Objects[PlayerPosition.Y][PlayerPosition.X - 1], Objects[PlayerPosition.Y][PlayerPosition.X]);
-                PlayerPosition.X -= 1;
+                xMovement = -1;
                 break;
             case VK_RIGHT:
-                std::swap(Objects[PlayerPosition.Y][PlayerPosition.X + 1], Objects[PlayerPosition.Y][PlayerPosition.X]);
-                PlayerPosition.X += 1;
+                xMovement = 1;
                 break;
             case VK_UP:
-                std::swap(Objects[PlayerPosition.Y - 1][PlayerPosition.X], Objects[PlayerPosition.Y][PlayerPosition.X]);
-                PlayerPosition.Y -= 1;
+                yMovement = -1;
                 break;
             case VK_DOWN:
-                std::swap(Objects[PlayerPosition.Y + 1][PlayerPosition.X], Objects[PlayerPosition.Y][PlayerPosition.X]);
-                PlayerPosition.Y += 1;
+                yMovement = 1;
                 break;
         }
 
-        SignalEnvironmentChanged();
+        if (xMovement == 0 && yMovement == 0) return;
+        
+        const bool playerMoved = MovePlayer(
+            Objects[PlayerPosition.Y + yMovement][PlayerPosition.X + xMovement],
+            Objects[PlayerPosition.Y][PlayerPosition.X],
+            xMovement,
+            yMovement
+        );
+        
+        if (playerMoved)
+        {
+            changes.push_back(Change({PlayerPosition.X + xMovement, PlayerPosition.Y + yMovement}, {PlayerPosition.X, PlayerPosition.Y}));
+
+            PlayerPosition.X += xMovement;
+            PlayerPosition.Y += yMovement;
+        }
+        
+        SignalEnvironmentChanged(changes);
+    }
+
+    bool MovePlayer(std::shared_ptr<Object>& object, std::shared_ptr<Object>& player, int xMovement, int yMovement)
+    {
+        bool moved = false;
+        switch (object->GetType())
+        {
+            case TWall: return false;
+            case TNothing:
+            case TDoor:
+                std::swap(object, player);
+                moved = true;
+                break;
+            case TItem:
+                // Pickup item
+                object.reset(new Object(object->Position, TNothing));
+                std::swap(object, player);
+                moved = true;
+                break;
+            case TEnemy:
+                // Fight enemy
+                return false;
+        }
+
+        if (moved)
+        {
+            object->Position.X += xMovement;
+            object->Position.Y += yMovement;
+            player->Position.X -= xMovement;
+            player->Position.Y -= yMovement;
+
+            return true;
+        }
+
+        return false;
     }
 private:
     Coordinates _dimensions;

@@ -19,6 +19,11 @@ public:
                 ReadConsoleInput(handle, &buffer, 1, &events);
                 if (buffer.Event.KeyEvent.bKeyDown)
                 {
+                    if (buffer.Event.KeyEvent.wVirtualKeyCode == VK_ESCAPE)
+                    {
+                        return;
+                    }
+                    
                     SignalKeyboardPress(buffer.Event.KeyEvent.wVirtualKeyCode);
                 }
             }
