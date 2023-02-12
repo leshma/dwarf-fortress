@@ -12,10 +12,20 @@
     }]
   },
   "Items": [{
-    "Position": [30, 10],
+    "PersistanceType": 1,
+    "ItemType": 2,
+    "Position": [12, 10],
     "Statistics": [{
-      "StatisticType": 128,
+      "Type": 128,
       "Value": 20
+    }]
+  }, {
+    "PersistanceType": 0,
+    "ItemType": 0,
+    "Position": [14, 10],
+    "Statistics": [{
+      "Type": 0,
+      "Value": 50
     }]
   }],
   "Rooms": [{

@@ -35,13 +35,39 @@ public:
                     {
                         case TWall:
                             Objects[y][x] = std::tuple<char, int>(' ', FOREGROUND_GREEN | BACKGROUND_RED | BACKGROUND_INTENSITY);
-                                break;
+                            break;
                         case TPlayer:
                             Objects[y][x] = std::tuple<char, int>('P', FOREGROUND_RED | BACKGROUND_RED | FOREGROUND_INTENSITY);
-                                break;
+                            break;
                         case TDoor:
                             Objects[y][x] = std::tuple<char, int>(' ', BACKGROUND_GREEN);
-                                break;
+                            break;
+                        case TItem:
+                            {
+                                char printCharacter = 'i';
+                                std::shared_ptr<Item> item = std::dynamic_pointer_cast<Item>(Environment->Objects[y][x]);
+                                if (item->PersistanceType == TEquippable)
+                                {
+                                    switch (item->ItemType)
+                                    {
+                                    case TWeapon:
+                                        printCharacter = 'w';
+                                        break;
+                                    case TArmor:
+                                        printCharacter = 'a';
+                                        break;
+                                    default:
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    printCharacter = 'c';
+                                }
+
+                                Objects[y][x] = std::tuple<char, int>(printCharacter, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | BACKGROUND_BLUE);
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -49,7 +75,7 @@ public:
         }
     }
 
-    void Draw()
+    void InitialDraw()
     {
         // Draw the game
         DWORD written;
@@ -68,16 +94,24 @@ public:
         }
 
         // Draw status
-        COORD statusPosition {0, 29};
-        SetConsoleCursorPosition(ConsoleScreenHandle, statusPosition);
-        std::cout << "Health: 100 | Damage: 20 | Armor: 5";
+        SetConsoleCursorPosition(ConsoleScreenHandle, _statusPosition);
+        std::cout << "Health: 100 | Damage: 0 | Armor: 0";
     }
 
-    void DrawChanges(std::vector<Change> changes)
+    void DrawChanges(std::vector<EnvironmentChange> environmentChanges)
+    {
+        DrawEnvironmentChanges(environmentChanges);
+        DrawStatusChanges();
+    }
+
+    void DrawEnvironmentChanges(std::vector<EnvironmentChange> changes)
     {
         DWORD written;
         for (const auto change : changes)
         {
+            if (change.FromObjectDisappears) Objects[change.From.Y][change.From.X] = std::tuple<char, int>(' ', BACKGROUND_GREEN);
+            if (change.ToObjectDisappears) Objects[change.To.Y][change.To.X] = std::tuple<char, int>(' ', BACKGROUND_GREEN);
+            
             const std::tuple<char, int> temp = Objects[change.From.Y][change.From.X];
             Objects[change.From.Y][change.From.X] = Objects[change.To.Y][change.To.X];
             Objects[change.To.Y][change.To.X] = temp;
@@ -101,6 +135,55 @@ public:
             );
         }
     }
+
+    void DrawStatusChanges()
+    {
+        Coordinates playerPosition = Environment->PlayerPosition;
+        std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(Environment->Objects[playerPosition.Y][playerPosition.X]);
+        
+        double health = player->Health, damage = 0.00, armor = 0.00;
+        if (player->Inventory->Weapon != nullptr)
+        {
+            for (const auto weaponStatistic : player->Inventory->Weapon->Statistics)
+            {
+                switch(weaponStatistic->Type)
+                {
+                    case Health:
+                        health += weaponStatistic->Value;
+                        break;
+                    case Damage:
+                        damage += weaponStatistic->Value;
+                        break;
+                    case Armor:
+                        armor += weaponStatistic->Value;
+                        break;
+                }                
+            }
+        }
+
+        if (player->Inventory->Armor != nullptr)
+        {
+            for (const auto armorStatistic : player->Inventory->Armor->Statistics)
+            {
+                switch(armorStatistic->Type)
+                {
+                    case Health:
+                        health += armorStatistic->Value;
+                        break;
+                    case Damage:
+                        damage += armorStatistic->Value;
+                        break;
+                    case Armor:
+                        armor += armorStatistic->Value;
+                        break;
+                }                
+            }
+        }
+            
+        ClearRow(_statusPosition);
+        SetConsoleCursorPosition(ConsoleScreenHandle, _statusPosition);
+        std::cout << "Health: " << health << " | Damage: " << damage << " | Armor: " << armor;
+    }
     
     void Clear() {
         COORD topLeft  = { 0, 0 };
@@ -116,4 +199,19 @@ public:
         );
         SetConsoleCursorPosition(ConsoleScreenHandle, topLeft);
     }
+
+    void ClearRow(COORD rowStart)
+    {
+        DWORD written;
+        GetConsoleScreenBufferInfo(ConsoleScreenHandle, &ConsoleScreenInfo);
+        FillConsoleOutputCharacterA(
+            ConsoleScreenHandle, ' ', ConsoleScreenInfo.dwSize.X, rowStart, &written
+        );
+        FillConsoleOutputAttribute(
+            ConsoleScreenHandle, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
+            ConsoleScreenInfo.dwSize.X, rowStart, &written
+        );
+    }
+private:
+    COORD _statusPosition {0, 29};
 };

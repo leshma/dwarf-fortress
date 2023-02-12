@@ -7,6 +7,7 @@
 class Inventory
 {
 public:
-    std::vector<std::shared_ptr<Item>> EquippedItems;
+    std::shared_ptr<Item> Weapon;
+    std::shared_ptr<Item> Armor;
     std::vector<std::shared_ptr<Item>> ContainedItems;
 };

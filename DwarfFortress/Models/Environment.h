@@ -12,7 +12,7 @@
 #include "Player.h"
 #include "Room.h"
 #include "Wall.h"
-#include "../ViewModels/Change.h"
+#include "../ViewModels/EnvironmentChange.h"
 
 // This class is used to process and gather data about the environment.
 class Environment
@@ -22,7 +22,7 @@ public:
     Coordinates PlayerPosition;
     std::vector<Coordinates> EnemyPositions;
 
-    boost::signals2::signal<void (std::vector<Change>)> SignalEnvironmentChanged;
+    boost::signals2::signal<void (std::vector<EnvironmentChange>)> SignalEnvironmentChanged;
 
     Environment(Coordinates dimensions, std::vector<std::shared_ptr<Object>> environmentObjects,
         std::vector<std::shared_ptr<Room>> environmentRooms)
@@ -91,7 +91,7 @@ public:
 
     void MoveTick(WORD keyPressed)
     {
-        std::vector<Change> changes;
+        std::vector<EnvironmentChange> changes;
         
         int xMovement = 0, yMovement = 0;
         switch (keyPressed)
@@ -108,61 +108,100 @@ public:
             case VK_DOWN:
                 yMovement = 1;
                 break;
+            case 0x31: // Key "1" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+                // Change / Equip weapon
+                break;
+            case 0x32: // Key "2" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+                // Change / Equip armor
+                break;
         }
 
         if (xMovement == 0 && yMovement == 0) return;
         
-        const bool playerMoved = MovePlayer(
+        const auto playerMoveChanges = MovePlayer(
             Objects[PlayerPosition.Y + yMovement][PlayerPosition.X + xMovement],
             Objects[PlayerPosition.Y][PlayerPosition.X],
             xMovement,
             yMovement
         );
-        
-        if (playerMoved)
-        {
-            changes.push_back(Change({PlayerPosition.X + xMovement, PlayerPosition.Y + yMovement}, {PlayerPosition.X, PlayerPosition.Y}));
-
-            PlayerPosition.X += xMovement;
-            PlayerPosition.Y += yMovement;
-        }
+        changes.insert(changes.end(), playerMoveChanges.begin(), playerMoveChanges.end());
         
         SignalEnvironmentChanged(changes);
     }
 
-    bool MovePlayer(std::shared_ptr<Object>& object, std::shared_ptr<Object>& player, int xMovement, int yMovement)
+    std::vector<EnvironmentChange> MovePlayer(std::shared_ptr<Object>& object, std::shared_ptr<Object>& playerObject, int xMovement, int yMovement)
     {
+        std::vector<EnvironmentChange> changes;
+        
         bool moved = false;
         switch (object->GetType())
         {
-            case TWall: return false;
+            case TWall: return changes;
             case TNothing:
             case TDoor:
-                std::swap(object, player);
+                changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {playerObject->Position.X, playerObject->Position.Y}));
+                std::swap(object, playerObject);
                 moved = true;
                 break;
             case TItem:
-                // Pickup item
-                object.reset(new Object(object->Position, TNothing));
-                std::swap(object, player);
-                moved = true;
-                break;
+                {
+                    std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(playerObject);
+                    std::shared_ptr<Item> item = std::dynamic_pointer_cast<Item>(object);
+
+                    if (item->PersistanceType == TEquippable)
+                    {
+                        switch (item->ItemType)
+                        {
+                        case TWeapon:
+                            if (player->Inventory->Weapon == nullptr)
+                            {
+                                player->Inventory->Weapon = item;
+                            }
+                            else
+                            {
+                                player->Inventory->ContainedItems.push_back(item);
+                            }
+                            break;
+                        case TArmor:
+                            if (player->Inventory->Armor == nullptr)
+                            {
+                                player->Inventory->Armor = item;
+                            }
+                            else
+                            {
+                                player->Inventory->ContainedItems.push_back(item);
+                            }
+                            break;
+                        default:
+                            player->Inventory->ContainedItems.push_back(item);
+                            break;
+                        }
+                    }
+            
+                    changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {playerObject->Position.X, playerObject->Position.Y}, true, false));
+                    object.reset(new Object(object->Position, TNothing));
+                    std::swap(object, playerObject);
+            
+                    moved = true;
+                    break;
+                }
             case TEnemy:
                 // Fight enemy
-                return false;
+                return changes;
         }
 
         if (moved)
         {
             object->Position.X += xMovement;
             object->Position.Y += yMovement;
-            player->Position.X -= xMovement;
-            player->Position.Y -= yMovement;
-
-            return true;
+            playerObject->Position.X -= xMovement;
+            playerObject->Position.Y -= yMovement;
+            
+            PlayerPosition.X += xMovement;
+            PlayerPosition.Y += yMovement;
         }
 
-        return false;
+        return changes;
     }
 private:
     Coordinates _dimensions;

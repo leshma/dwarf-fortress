@@ -9,4 +9,6 @@ public:
     StatisticType Type;
     // Value of the statistic.
     double Value;
+
+    Statistic(StatisticType type, double value) : Type(type), Value(value) {  }
 };

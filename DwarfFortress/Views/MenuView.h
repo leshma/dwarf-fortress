@@ -1,7 +1,6 @@
 ﻿#pragma once
-#include "View.h"
 
-class MenuView : View
+class MenuView
 {
 public:
     
