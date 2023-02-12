@@ -27,6 +27,25 @@
       "Type": 0,
       "Value": 50
     }]
+  }, {
+    "PersistanceType": 0,
+    "ItemType": 0,
+    "Position": [16, 10],
+    "Statistics": [{
+      "Type": 0,
+      "Value": 30
+    }, {
+      "Type": 2,
+      "Value": 20
+    }]
+  }, {
+    "PersistanceType": 0,
+    "ItemType": 1,
+    "Position": [17, 10],
+    "Statistics": [{
+      "Type": 1,
+      "Value": 20
+    }]
   }],
   "Rooms": [{
     "From": [0, 0],

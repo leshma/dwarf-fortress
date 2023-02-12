@@ -18,7 +18,8 @@ int main()
     KeyboardController keyboardController;
 
     view.InitialDraw();
-    environment->SignalEnvironmentChanged.connect(bind(&View::DrawChanges, &view, _1));
+    environment->SignalEnvironmentChanged.connect(bind(&View::DrawEnvironmentChanges, &view, _1));
+    environment->SignalStatusChanged.connect(bind(&View::DrawStatusChanges, &view));
     keyboardController.SignalKeyboardPress.connect(bind(&Environment::MoveTick, environment, _1));
     keyboardController.ListenToInputs();
     

@@ -931,6 +931,7 @@
     <ClInclude Include="Models\Statistics\Statistic.h" />
     <ClInclude Include="Models\Statistics\StatisticType.h" />
     <ClInclude Include="Models\Wall.h" />
+    <ClInclude Include="Utilities\AdditionalVirtualKeyCodes.h" />
     <ClInclude Include="Utilities\LevelLoader.h" />
     <ClInclude Include="ViewModels\EnvironmentChange.h" />
     <ClInclude Include="Views\GameView.h" />

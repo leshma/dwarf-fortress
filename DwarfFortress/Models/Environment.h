@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "Room.h"
 #include "Wall.h"
+#include "../Utilities/AdditionalVirtualKeyCodes.h"
 #include "../ViewModels/EnvironmentChange.h"
 
 // This class is used to process and gather data about the environment.
@@ -23,6 +24,7 @@ public:
     std::vector<Coordinates> EnemyPositions;
 
     boost::signals2::signal<void (std::vector<EnvironmentChange>)> SignalEnvironmentChanged;
+    boost::signals2::signal<void ()> SignalStatusChanged;
 
     Environment(Coordinates dimensions, std::vector<std::shared_ptr<Object>> environmentObjects,
         std::vector<std::shared_ptr<Room>> environmentRooms)
@@ -97,25 +99,62 @@ public:
         switch (keyPressed)
         {
             case VK_LEFT:
+            case VK_A:
                 xMovement = -1;
                 break;
             case VK_RIGHT:
+            case VK_D:
                 xMovement = 1;
                 break;
             case VK_UP:
+            case VK_W:
                 yMovement = -1;
                 break;
             case VK_DOWN:
+            case VK_S:
                 yMovement = 1;
                 break;
             case 0x31: // Key "1" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
                 // Change / Equip weapon
+                {
+                    std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(Objects[PlayerPosition.Y][PlayerPosition.X]);
+
+                    int i = 0;
+                    for (; i < player->Inventory->ContainedItems.size(); ++i)
+                    {
+                        if (player->Inventory->ContainedItems[i]->ItemType == TWeapon)
+                            break;
+                    }
+
+                    player->Inventory->ContainedItems.push_back(player->Inventory->Weapon);
+                    player->Inventory->Weapon = player->Inventory->ContainedItems[i];
+                    player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
+
+                    SignalStatusChanged();
+                }
                 break;
             case 0x32: // Key "2" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
                 // Change / Equip armor
+                {
+                    std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(Objects[PlayerPosition.Y][PlayerPosition.X]);
+
+                    int i = 0;
+                    for (; i < player->Inventory->ContainedItems.size(); ++i)
+                    {
+                        if (player->Inventory->ContainedItems[i]->ItemType == TArmor)
+                            break;
+                    }
+
+                    player->Inventory->ContainedItems.push_back(player->Inventory->Armor);
+                    player->Inventory->Armor = player->Inventory->ContainedItems[i];
+                    player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
+
+                    SignalStatusChanged();
+                }
                 break;
         }
 
+        // Check if there's any movement...
         if (xMovement == 0 && yMovement == 0) return;
         
         const auto playerMoveChanges = MovePlayer(
@@ -127,6 +166,7 @@ public:
         changes.insert(changes.end(), playerMoveChanges.begin(), playerMoveChanges.end());
         
         SignalEnvironmentChanged(changes);
+        SignalStatusChanged();
     }
 
     std::vector<EnvironmentChange> MovePlayer(std::shared_ptr<Object>& object, std::shared_ptr<Object>& playerObject, int xMovement, int yMovement)
