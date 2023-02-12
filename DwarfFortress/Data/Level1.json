@@ -6,9 +6,47 @@
   },
   "NonPlayableCharacters": {
     "Enemies": [{
-      "Position": [20, 20],
+      "Position": [100, 5],
       "Health": 100,
-      "Items": []
+      "Weapon": {
+        "PersistanceType": 0,
+        "ItemType": 0,
+        "Position": [-1, -1],
+        "Statistics": [{
+          "Type": 0,
+          "Value": 20
+        }]
+      }
+    }, {
+      "Position": [100, 20],
+      "Health": 50,
+      "Weapon": {
+        "PersistanceType": 0,
+        "ItemType": 0,
+        "Position": [-1, -1],
+        "Statistics": [{
+          "Type": 0,
+          "Value": 25
+        }]
+      },
+      "Armor": {
+        "PersistanceType": 0,
+        "ItemType": 1,
+        "Position": [-1, -1],
+        "Statistics": [{
+          "Type": 1,
+          "Value": 15
+        }]
+      },
+      "DroppableItems": [{
+        "PersistanceType": 0,
+        "ItemType": 1,
+        "Position": [-1, -1],
+        "Statistics": [{
+          "Type": 1,
+          "Value": 15
+        }]
+      }]
     }]
   },
   "Items": [{
@@ -44,7 +82,7 @@
     "Position": [17, 10],
     "Statistics": [{
       "Type": 1,
-      "Value": 20
+      "Value": 5
     }]
   }],
   "Rooms": [{

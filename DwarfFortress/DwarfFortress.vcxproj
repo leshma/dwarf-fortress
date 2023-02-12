@@ -276,6 +276,7 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Models\Combat.cpp" />
     <ClCompile Include="Models\Inventory.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -915,8 +916,9 @@
     <ClInclude Include="Models\Coordinates.h" />
     <ClInclude Include="Models\Door.h" />
     <ClInclude Include="Models\Enemy.h" />
-    <ClInclude Include="Models\EntryPoint.h" />
+    <ClInclude Include="Models\Direction.h" />
     <ClInclude Include="Models\Environment.h" />
+    <ClInclude Include="Models\Combat.h" />
     <ClInclude Include="Models\Inventory.h" />
     <ClInclude Include="Models\Items\Item.h" />
     <ClInclude Include="Models\Items\ItemType.h" />

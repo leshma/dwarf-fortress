@@ -4,7 +4,8 @@
 #include <experimental/filesystem>
 
 #include "../Externals/json/json.h"
-#include "../Models/EntryPoint.h"
+#include "../Models/Enemy.h"
+#include "../Models/Direction.h"
 #include "../Models/Object.h"
 #include "../Models/Player.h"
 #include "../Models/Room.h"
@@ -36,7 +37,14 @@ public:
 
         LoadPlayer(levelJson);
         LoadRooms(levelJson);
-        LoadItems(levelJson);
+
+        if (levelJson.isMember("Items"))
+        {
+            const auto items = LoadItems(levelJson["Items"]);
+            LoadedObjects.insert(LoadedObjects.begin(), items.begin(), items.end());
+        }
+
+        LoadNonPlayableCharacters(levelJson);
     }
 private:
     void LoadPlayer(Json::Value levelJson)
@@ -63,39 +71,83 @@ private:
             {
                 Coordinates from =   { e["From"][0].asInt(), e["From"][1].asInt() };
                 Coordinates to =     { e["To"][0].asInt(),   e["To"][1].asInt() };
-                EntryPoint entryPoint = static_cast<EntryPoint>(e["EntryPoint"].asInt());
+                Direction entryPoint = static_cast<Direction>(e["EntryPoint"].asInt());
                 return std::make_shared<Room>(from, to, entryPoint);
             });
         }
     }
 
-    void LoadItems(Json::Value levelJson)
+    std::vector<std::shared_ptr<Item>> LoadItems(Json::Value itemsJson)
     {
-        if (levelJson.isMember("Items"))
+        std::vector<std::shared_ptr<Item>> items;
+        std::transform(itemsJson.begin(), itemsJson.end(), std::back_inserter(items), [this](const auto& e)
         {
-            auto itemsJson = levelJson["Items"];
+            return LoadItem(e);
+        });
 
-            std::vector<std::shared_ptr<Item>> items;
-            std::transform(itemsJson.begin(), itemsJson.end(), std::back_inserter(items), [](const auto& e)
+        return items;
+    }
+
+    std::shared_ptr<Item> LoadItem(Json::Value itemJson)
+    {
+        Coordinates position = { itemJson["Position"][0].asInt(), itemJson["Position"][1].asInt() };
+        PersistanceType persistanceType = static_cast<PersistanceType>(itemJson["PersistanceType"].asInt());
+        ItemType itemType = static_cast<ItemType>(itemJson["ItemType"].asInt());
+            
+        auto statisticsJson = itemJson["Statistics"];
+        std::vector<std::shared_ptr<Statistic>> statistics;
+
+        std::transform(statisticsJson.begin(), statisticsJson.end(), std::back_inserter(statistics), [](const auto& s)
+        {
+            StatisticType type = static_cast<StatisticType>(s["Type"].asInt());
+            double value = s["Value"].asDouble();
+            return std::make_shared<Statistic>(type, value);
+        });
+            
+        return std::make_shared<Item>(position, statistics, persistanceType, itemType);
+    }
+
+    void LoadNonPlayableCharacters(Json::Value levelJson)
+    {
+        if (levelJson.isMember("NonPlayableCharacters"))
+        {
+            LoadEnemies(levelJson["NonPlayableCharacters"]);
+        }
+    }
+
+    void LoadEnemies(Json::Value levelJson)
+    {
+        if (levelJson.isMember("Enemies"))
+        {
+            auto enemiesJson = levelJson["Enemies"];
+
+            std::vector<std::shared_ptr<Enemy>> enemies;
+            std::transform(enemiesJson.begin(), enemiesJson.end(), std::back_inserter(enemies), [this](const auto& e)
             {
                 Coordinates position = { e["Position"][0].asInt(), e["Position"][1].asInt() };
-                PersistanceType persistanceType = static_cast<PersistanceType>(e["PersistanceType"].asInt());
-                ItemType itemType = static_cast<ItemType>(e["ItemType"].asInt());
-                
-                auto statisticsJson = e["Statistics"];
-                std::vector<std::shared_ptr<Statistic>> statistics;
+                int health = e["Health"].asInt();
+                std::shared_ptr<Item> weapon, armor;
+                std::vector<std::shared_ptr<Item>> droppableItems;
 
-                std::transform(statisticsJson.begin(), statisticsJson.end(), std::back_inserter(statistics), [](const auto& s)
+                if (e.isMember("Weapon"))
                 {
-                    StatisticType type = static_cast<StatisticType>(s["Type"].asInt());
-                    double value = s["Value"].asDouble();
-                    return std::make_shared<Statistic>(type, value);
-                });
+                    weapon = LoadItem(e["Weapon"]);
+                }
+
+                if (e.isMember("Armor"))
+                {
+                    armor = LoadItem(e["Armor"]);
+                }
+
+                if (e.isMember("DroppableItems"))
+                {
+                    droppableItems = LoadItems(e["DroppableItems"]);
+                }
                 
-                return std::make_shared<Item>(position, statistics, persistanceType, itemType);
+                return std::make_shared<Enemy>(position, health, weapon, armor, droppableItems);
             });
 
-            LoadedObjects.insert(LoadedObjects.begin(), items.begin(), items.end());
+            LoadedObjects.insert(LoadedObjects.begin(), enemies.begin(), enemies.end());
         }
     }
 };

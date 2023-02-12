@@ -17,4 +17,37 @@ public:
 
     Item(Coordinates position, std::vector<std::shared_ptr<Statistic>> statistics, enum PersistanceType persistanceType, enum ItemType itemType)
         : Object(position, TItem), Statistics(std::move(statistics)), PersistanceType(persistanceType), ItemType(itemType) {  }
+
+    int GetDamageStat()
+    {
+        int damage = 0;
+        for (auto statistic : Statistics)
+        {
+            if (statistic->Type == Damage)
+                damage += statistic->Value;
+        }
+        return damage;
+    }
+
+    int GetArmorStat()
+    {
+        int armor = 0;
+        for (auto statistic : Statistics)
+        {
+            if (statistic->Type == Armor)
+                armor += statistic->Value;
+        }
+        return armor;
+    }
+
+    int GetHealthStat()
+    {
+        int health = 0;
+        for (auto statistic : Statistics)
+        {
+            if (statistic->Type == Health)
+                health += statistic->Value;
+        }
+        return health;
+    }
 };

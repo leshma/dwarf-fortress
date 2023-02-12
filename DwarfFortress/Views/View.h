@@ -34,10 +34,10 @@ public:
                     switch (Environment->Objects[y][x]->GetType())
                     {
                         case TWall:
-                            Objects[y][x] = std::tuple<char, int>(' ', FOREGROUND_GREEN | BACKGROUND_RED | BACKGROUND_INTENSITY);
+                            Objects[y][x] = std::tuple<char, int>(' ', BACKGROUND_RED | BACKGROUND_GREEN);
                             break;
                         case TPlayer:
-                            Objects[y][x] = std::tuple<char, int>('P', FOREGROUND_RED | BACKGROUND_RED | FOREGROUND_INTENSITY);
+                            Objects[y][x] = std::tuple<char, int>('P', FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY);
                             break;
                         case TDoor:
                             Objects[y][x] = std::tuple<char, int>(' ', BACKGROUND_GREEN);
@@ -67,6 +67,9 @@ public:
 
                                 Objects[y][x] = std::tuple<char, int>(printCharacter, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | BACKGROUND_BLUE);
                             }
+                            break;
+                        case TEnemy:
+                            Objects[y][x] = std::tuple<char, int>('!', FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | BACKGROUND_RED);
                             break;
                         default:
                             break;

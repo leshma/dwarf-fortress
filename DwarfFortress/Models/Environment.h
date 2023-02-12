@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <boost/signals2.hpp>
 
+#include "Combat.h"
 #include "Coordinates.h"
 #include "Door.h"
 #include "Enemy.h"
@@ -129,8 +130,6 @@ public:
                     player->Inventory->ContainedItems.push_back(player->Inventory->Weapon);
                     player->Inventory->Weapon = player->Inventory->ContainedItems[i];
                     player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
-
-                    SignalStatusChanged();
                 }
                 break;
             case 0x32: // Key "2" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
@@ -148,22 +147,27 @@ public:
                     player->Inventory->ContainedItems.push_back(player->Inventory->Armor);
                     player->Inventory->Armor = player->Inventory->ContainedItems[i];
                     player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
-
-                    SignalStatusChanged();
                 }
                 break;
+            // If the player accidentally pressed a button or similar...
+            default: return;
         }
 
         // Check if there's any movement...
-        if (xMovement == 0 && yMovement == 0) return;
-        
-        const auto playerMoveChanges = MovePlayer(
-            Objects[PlayerPosition.Y + yMovement][PlayerPosition.X + xMovement],
-            Objects[PlayerPosition.Y][PlayerPosition.X],
-            xMovement,
-            yMovement
-        );
-        changes.insert(changes.end(), playerMoveChanges.begin(), playerMoveChanges.end());
+        if (xMovement != 0 || yMovement != 0)
+        {
+            const auto playerMoveChanges = MovePlayer(
+                Objects[PlayerPosition.Y + yMovement][PlayerPosition.X + xMovement],
+                Objects[PlayerPosition.Y][PlayerPosition.X],
+                xMovement,
+                yMovement
+            );
+            
+            changes.insert(changes.end(), playerMoveChanges.begin(), playerMoveChanges.end());
+        }
+
+        const auto enemyMoveChanges = MoveEnemies();
+        changes.insert(changes.end(), enemyMoveChanges.begin(), enemyMoveChanges.end());
         
         SignalEnvironmentChanged(changes);
         SignalStatusChanged();
@@ -227,7 +231,31 @@ public:
                 }
             case TEnemy:
                 // Fight enemy
-                return changes;
+                {
+                    std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(playerObject);
+                    std::shared_ptr<Enemy> enemy = std::dynamic_pointer_cast<Enemy>(object);
+
+                    bool killedEnemy = Combat::PlayerHitsEnemy(player, enemy);
+                    if (killedEnemy)
+                    {
+                        // Take all items
+                        player->Inventory->ContainedItems.insert(player->Inventory->ContainedItems.end(), enemy->DroppableItems.begin(), enemy->DroppableItems.end());
+
+                        // Remove the enemy
+                        int i = 0;
+                        while (EnemyPositions[i].X != object->Position.X && EnemyPositions[i].Y != object->Position.Y)
+                        {
+                            ++i;
+                        }
+                        EnemyPositions.erase(EnemyPositions.begin() + i);
+                        
+                        changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {playerObject->Position.X, playerObject->Position.Y}, true, false));
+                        object.reset(new Object(object->Position, TNothing));
+                        std::swap(object, playerObject);
+
+                        moved = true;
+                    }
+                }
         }
 
         if (moved)
@@ -239,6 +267,110 @@ public:
             
             PlayerPosition.X += xMovement;
             PlayerPosition.Y += yMovement;
+        }
+
+        return changes;
+    }
+
+    std::vector<EnvironmentChange> MoveEnemies()
+    {
+        std::vector<EnvironmentChange> changes;
+        
+        for (int i = 0; i < EnemyPositions.size(); ++i)
+        {
+            const auto enemyChanges = MoveEnemy(EnemyPositions[i]);
+            changes.insert(changes.end(), enemyChanges.begin(), enemyChanges.end());
+        }
+        
+        return changes;
+    }
+
+    std::vector<EnvironmentChange> MoveEnemy(Coordinates& enemyPosition)
+    {
+        std::vector<EnvironmentChange> changes;
+        
+        std::shared_ptr<Object>& enemyObject = Objects[enemyPosition.Y][enemyPosition.X];
+        std::shared_ptr<Enemy> enemy = std::dynamic_pointer_cast<Enemy>(enemyObject);
+
+        const bool isEnemyNextToPlayer = abs(PlayerPosition.Y - enemyPosition.Y + PlayerPosition.X - enemyPosition.X) == 1;
+        if (enemy->InCombat && isEnemyNextToPlayer)
+        {
+            std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(Objects[PlayerPosition.Y][PlayerPosition.X]);
+            bool killedPlayer = Combat::EnemyHitsPlayer(enemy, player);
+
+            if (killedPlayer)
+            {
+                exit(-1);
+            }
+            
+            return changes;
+        }
+        else
+        {
+            enemy->InCombat = false;    
+        }
+        
+        int direction = rand() % 4 + 1, xMovement = 0, yMovement = 0;
+        switch (direction)
+        {
+        case 1: // Left
+            xMovement = -1;
+            break;
+        case 2: // Bottom
+            yMovement = 1;
+            break;
+        case 3: // Right
+            xMovement = 1;
+            break;
+        case 4: // Top
+            yMovement = -1;
+            break;
+        }
+
+        std::shared_ptr<Object>& object = Objects[enemyObject->Position.Y + yMovement][enemyObject->Position.X + xMovement];
+        
+        bool moved = false;
+        switch (object->GetType())
+        {
+            case TWall: return changes;
+            case TNothing:
+            case TDoor:
+            case TEnemy:
+                changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {enemyObject->Position.X, enemyObject->Position.Y}));
+                std::swap(object, enemyObject);
+                moved = true;
+                break;
+            case TItem:
+                {
+                    std::shared_ptr<Item> item = std::dynamic_pointer_cast<Item>(object);
+
+                    enemy->DroppableItems.push_back(item);
+            
+                    changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {enemyObject->Position.X, enemyObject->Position.Y}, true, false));
+                    object.reset(new Object(object->Position, TNothing));
+                    std::swap(object, enemyObject);
+            
+                    moved = true;
+                    break;
+                }
+            case TPlayer:
+                // Combat
+                {
+                    std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(Objects[PlayerPosition.Y][PlayerPosition.X]);
+                    Combat::EnemyHitsPlayer(enemy, player);
+                }
+            break;
+        }
+
+        if (moved)
+        {
+            object->Position.X += xMovement;
+            object->Position.Y += yMovement;
+            enemyObject->Position.X -= xMovement;
+            enemyObject->Position.Y -= yMovement;
+
+            enemyPosition.X += xMovement;
+            enemyPosition.Y += yMovement;
         }
 
         return changes;

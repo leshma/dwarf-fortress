@@ -1,6 +1,6 @@
 #pragma once
 
-enum EntryPoint
+enum Direction
 {
     None, Left, Bottom, Right, Top
 };

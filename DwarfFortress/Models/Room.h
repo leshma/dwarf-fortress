@@ -1,15 +1,15 @@
 #pragma once
 #include "Coordinates.h"
-#include "EntryPoint.h"
+#include "Direction.h"
 
 class Room
 {
 public:
     Coordinates From;
     Coordinates To;
-    EntryPoint EntryPoint;
+    Direction EntryPoint;
 
-    Room(Coordinates from, Coordinates to, enum EntryPoint entryPoint)
+    Room(Coordinates from, Coordinates to, enum Direction entryPoint)
         : From(from), To(to), EntryPoint(entryPoint)
     {  }
 };
