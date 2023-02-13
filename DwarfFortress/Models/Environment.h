@@ -115,7 +115,7 @@ public:
             case VK_S:
                 yMovement = 1;
                 break;
-            case 0x31: // Key "1" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+            case VK_1: // Key "1" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
                 // Change / Equip weapon
                 {
                     std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(Objects[PlayerPosition.Y][PlayerPosition.X]);
@@ -127,12 +127,14 @@ public:
                             break;
                     }
 
+                    if (i >= player->Inventory->ContainedItems.size()) break;
+
                     player->Inventory->ContainedItems.push_back(player->Inventory->Weapon);
                     player->Inventory->Weapon = player->Inventory->ContainedItems[i];
                     player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
                 }
                 break;
-            case 0x32: // Key "2" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+            case VK_2: // Key "2" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
                 // Change / Equip armor
                 {
                     std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(Objects[PlayerPosition.Y][PlayerPosition.X]);
@@ -144,8 +146,34 @@ public:
                             break;
                     }
 
+                    if (i >= player->Inventory->ContainedItems.size()) break;
+
                     player->Inventory->ContainedItems.push_back(player->Inventory->Armor);
                     player->Inventory->Armor = player->Inventory->ContainedItems[i];
+                    player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
+                }
+                break;
+            case VK_3:
+                // Consume health potion
+                {
+                    std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(Objects[PlayerPosition.Y][PlayerPosition.X]);
+
+                    int i = 0;
+                    for (; i < player->Inventory->ContainedItems.size(); ++i)
+                    {
+                        if (player->Inventory->ContainedItems[i]->ItemType == TPotion)
+                            break;
+                    }
+
+                    if (i >= player->Inventory->ContainedItems.size()) break;
+
+                    for (const auto statistic : player->Inventory->ContainedItems[i]->Statistics)
+                    {
+                        if (statistic->Type == HealthRestore)
+                        {
+                            player->Health += static_cast<int>(statistic->Value);
+                        }
+                    }
                     player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
                 }
                 break;
@@ -220,6 +248,10 @@ public:
                             player->Inventory->ContainedItems.push_back(item);
                             break;
                         }
+                    }
+                    else
+                    {
+                        player->Inventory->ContainedItems.push_back(item);
                     }
             
                     changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {playerObject->Position.X, playerObject->Position.Y}, true, false));

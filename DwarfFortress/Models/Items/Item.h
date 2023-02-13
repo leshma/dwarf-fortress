@@ -24,7 +24,7 @@ public:
         for (auto statistic : Statistics)
         {
             if (statistic->Type == Damage)
-                damage += statistic->Value;
+                damage += static_cast<int>(statistic->Value);
         }
         return damage;
     }
@@ -35,7 +35,7 @@ public:
         for (auto statistic : Statistics)
         {
             if (statistic->Type == Armor)
-                armor += statistic->Value;
+                armor += static_cast<int>(statistic->Value);
         }
         return armor;
     }
@@ -46,7 +46,7 @@ public:
         for (auto statistic : Statistics)
         {
             if (statistic->Type == Health)
-                health += statistic->Value;
+                health += static_cast<int>(statistic->Value);
         }
         return health;
     }
