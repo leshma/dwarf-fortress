@@ -71,8 +71,8 @@ public:
                 Coordinates entryPointPosition = {-1, -1};
                 if (direction[6])
                 {
-                    entryPointPosition.X = rand() % (direction[2] - direction[0] + 1);
-                    entryPointPosition.Y = rand() % (direction[3] - direction[1] + 1);
+                    entryPointPosition.X = (direction[2] - direction[0]) / 2;
+                    entryPointPosition.Y = (direction[3] - direction[1]) / 2;
                 }
                 
                 for (int x = direction[0], y = direction[1];
@@ -332,10 +332,11 @@ public:
         bool moved = false;
         switch (object->GetType())
         {
-            case TWall: return changes;
+            case TEnemy:
+            case TWall:
+                return changes;
             case TNothing:
             case TDoor:
-            case TEnemy:
                 changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {enemyObject->Position.X, enemyObject->Position.Y}));
                 std::swap(object, enemyObject);
                 moved = true;

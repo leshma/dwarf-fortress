@@ -12,6 +12,8 @@ using namespace std;
 
 int main()
 {
+    srand(time(nullptr));
+    
     LevelLoader levelLoader("Data/Level1.json");
     std::shared_ptr<Environment> environment = std::make_shared<Environment>(Coordinates {119, 29}, levelLoader.LoadedObjects, levelLoader.LoadedRooms);
     View view(environment);
