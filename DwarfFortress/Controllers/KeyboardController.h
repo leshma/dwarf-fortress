@@ -6,7 +6,7 @@
 class KeyboardController
 {
 public:
-    void ListenToInputs()
+    WORD ListenToInputs()
     {
         const HANDLE handle = GetStdHandle(STD_INPUT_HANDLE);
         DWORD events;
@@ -19,9 +19,14 @@ public:
                 ReadConsoleInput(handle, &buffer, 1, &events);
                 if (buffer.Event.KeyEvent.bKeyDown)
                 {
-                    if (buffer.Event.KeyEvent.wVirtualKeyCode == VK_ESCAPE)
+                    switch (buffer.Event.KeyEvent.wVirtualKeyCode)
                     {
-                        return;
+                    case VK_ESCAPE: // Exit the game
+                    case VK_F1: // Save
+                    case VK_F2: // Load
+                        return buffer.Event.KeyEvent.wVirtualKeyCode;
+                    default:
+                        break;
                     }
                     
                     SignalKeyboardPress(buffer.Event.KeyEvent.wVirtualKeyCode);

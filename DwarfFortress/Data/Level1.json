@@ -262,7 +262,8 @@
       }]
     }]
   },
-  "Items": [{
+  "Items": [
+    {
     "PersistanceType": 0,
     "ItemType": 0,
     "Position": [4, 4],
@@ -319,7 +320,8 @@
       "Value": 100
     }]
   }],
-  "Rooms": [{
+  "Rooms": [
+    {
     "From": [0, 0],
     "To":   [118, 28]
   }, {

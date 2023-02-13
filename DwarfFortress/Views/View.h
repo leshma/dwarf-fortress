@@ -96,9 +96,7 @@ public:
             }
         }
 
-        // Draw status
-        SetConsoleCursorPosition(ConsoleScreenHandle, _statusPosition);
-        std::cout << "Health: 100 | Damage: 0 | Armor: 0";
+        DrawStatusChanges();
     }
 
     void DrawChanges(std::vector<EnvironmentChange> environmentChanges)

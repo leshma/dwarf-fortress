@@ -735,7 +735,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Models\Wall.cpp" />
-    <ClCompile Include="Utilities\LevelLoader.cpp" />
+    <ClCompile Include="Utilities\LevelManager.cpp" />
     <ClCompile Include="ViewModels\EnvironmentChange.cpp" />
     <ClCompile Include="Views\GameView.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -934,7 +934,7 @@
     <ClInclude Include="Models\Statistics\StatisticType.h" />
     <ClInclude Include="Models\Wall.h" />
     <ClInclude Include="Utilities\AdditionalVirtualKeyCodes.h" />
-    <ClInclude Include="Utilities\LevelLoader.h" />
+    <ClInclude Include="Utilities\LevelManager.h" />
     <ClInclude Include="ViewModels\EnvironmentChange.h" />
     <ClInclude Include="Views\GameView.h" />
     <ClInclude Include="Views\MenuView.h" />
@@ -942,6 +942,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\Level1.json" />
+    <Content Include="Data\quicksave.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
