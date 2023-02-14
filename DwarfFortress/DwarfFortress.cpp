@@ -12,40 +12,35 @@ using namespace std;
 
 int main()
 {
-    /*
-     *  TODO:
-     *  - Prebaciti sve iz .h u .cpp
-     *  - Optimizovati šta se može
-     *  - Istestirati sve
-     */
-    srand(time(nullptr));
+    // Set the randomizer
+    srand(static_cast<unsigned int>(time(nullptr)));
 
     string levelFilePath = "Data/Level1.json";
     WORD lastInput;
     do
     {
-        LevelManager levelManager(levelFilePath);
-        std::shared_ptr<Environment> environment = std::make_shared<Environment>(Coordinates {119, 29}, levelManager.LoadedObjects, levelManager.LoadedRooms);
-        View view(environment);
-        KeyboardController keyboardController;
+        const std::unique_ptr<LevelManager> levelManager(new LevelManager(levelFilePath));
+        const std::shared_ptr<Environment> environment(new Environment(Coordinates {119, 29}, levelManager->LoadedObjects, levelManager->LoadedRooms));
+        const std::shared_ptr<View> view(new View(environment));
+        const std::unique_ptr<KeyboardController> keyboardController(new KeyboardController());
 
-        view.InitialDraw();
+        view->InitialDraw();
 
-        environment->SignalEnvironmentChanged.connect(bind(&View::DrawEnvironmentChanges, &view, _1));
-        environment->SignalStatusChanged.connect(bind(&View::DrawStatusChanges, &view));
-        environment->SignalActionTextChanged.connect(bind(&View::DrawActionText, &view, _1));
+        environment->SignalEnvironmentChanged.connect(bind(&View::DrawEnvironmentChanges, view, _1));
+        environment->SignalStatusChanged.connect(bind(&View::DrawStatusChanges, view));
+        environment->SignalActionTextChanged.connect(bind(&View::DrawActionText, view, _1));
         
-        keyboardController.SignalKeyboardPress.connect(bind(&Environment::MoveTick, environment, _1));
-        keyboardController.SignalActionTextChanged.connect(bind(&View::DrawActionText, &view, _1));
+        keyboardController->SignalKeyboardPress.connect(bind(&Environment::MoveTick, environment, _1));
+        keyboardController->SignalActionTextChanged.connect(bind(&View::DrawActionText, view, _1));
 
         do
         {
-            lastInput = keyboardController.ListenToInputs();
+            lastInput = keyboardController->ListenToInputs();
 
             // Save the game state
             if (lastInput == VK_F1)
             {
-                levelManager.SaveFile(LevelManager::QuickSaveFilePath, environment);
+                levelManager->SaveFile(LevelManager::QuickSaveFilePath, environment);
             }
         }
         while (lastInput != VK_F2 && lastInput != VK_ESCAPE);

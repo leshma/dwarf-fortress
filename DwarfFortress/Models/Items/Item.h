@@ -8,46 +8,30 @@
 #include "../Object.h"
 #include "../Statistics/Statistic.h"
 
+/**
+ * \brief A class representing an Item in the game.
+ * <br/> An Item can be various: Weapons, Armor, Consumables, etc.
+ */
 class Item : public Object
 {
 public:
+    // A vector containing the item's stats.
     std::vector<std::shared_ptr<Statistic>> Statistics;
+
+    // The type of persistance of this item. (Equippable or Consumable)
     PersistanceType PersistanceType;
+
+    // The type of the Item.
     ItemType ItemType;
 
-    Item(Coordinates position, std::vector<std::shared_ptr<Statistic>> statistics, enum PersistanceType persistanceType, enum ItemType itemType)
-        : Object(position, TItem), Statistics(std::move(statistics)), PersistanceType(persistanceType), ItemType(itemType) {  }
+    Item(Coordinates position, std::vector<std::shared_ptr<Statistic>> statistics, enum PersistanceType persistanceType, enum ItemType itemType);
 
-    int GetDamageStat()
-    {
-        int damage = 0;
-        for (auto statistic : Statistics)
-        {
-            if (statistic->Type == Damage)
-                damage += static_cast<int>(statistic->Value);
-        }
-        return damage;
-    }
+    // Returns the full Damage statistic of the Item.
+    int GetDamageStat();
 
-    int GetArmorStat()
-    {
-        int armor = 0;
-        for (auto statistic : Statistics)
-        {
-            if (statistic->Type == Armor)
-                armor += static_cast<int>(statistic->Value);
-        }
-        return armor;
-    }
+    // Returns the full Armor statistic of the Item.
+    int GetArmorStat();
 
-    int GetHealthStat()
-    {
-        int health = 0;
-        for (auto statistic : Statistics)
-        {
-            if (statistic->Type == Health)
-                health += static_cast<int>(statistic->Value);
-        }
-        return health;
-    }
+    // Returns the full Health statistic of the Item.
+    int GetHealthStat();
 };

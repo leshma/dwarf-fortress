@@ -2,6 +2,10 @@
 #include "Coordinates.h"
 #include "ObjectType.h"
 
+/**
+ * \brief A generic class representing all of the objects in the game.
+ * <br/> It contains the most important information about an object such as their Position and Object Type.
+ */
 class Object
 {
 public:
@@ -10,12 +14,11 @@ public:
 
     Object() : Position({1, 1}), _objectType(TNothing) {  }
 
-    Object(Coordinates position, ObjectType type) : Position(position), _objectType(type) {  }
+    Object(Coordinates position, ObjectType type);
 
-    ObjectType GetType() const { return _objectType; }
+    ObjectType GetType() const;
 
-    virtual ~Object() = default;
-
+    virtual ~Object();
 private:
     ObjectType _objectType;
 };

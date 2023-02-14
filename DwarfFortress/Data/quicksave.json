@@ -42,8 +42,8 @@
 				"Health" : 50,
 				"Position" : 
 				[
-					61,
-					1
+					63,
+					5
 				],
 				"Weapon" : 
 				{
@@ -67,8 +67,8 @@
 				"Health" : 50,
 				"Position" : 
 				[
-					66,
-					19
+					64,
+					14
 				],
 				"Weapon" : 
 				{
@@ -92,8 +92,8 @@
 				"Health" : 40,
 				"Position" : 
 				[
-					40,
-					24
+					37,
+					25
 				],
 				"Weapon" : 
 				{
@@ -117,8 +117,8 @@
 				"Health" : 30,
 				"Position" : 
 				[
-					55,
-					27
+					57,
+					26
 				],
 				"Weapon" : 
 				{
@@ -142,8 +142,8 @@
 				"Health" : 70,
 				"Position" : 
 				[
-					65,
-					25
+					67,
+					23
 				],
 				"Weapon" : 
 				{
@@ -190,8 +190,8 @@
 				"Health" : 40,
 				"Position" : 
 				[
-					77,
-					27
+					75,
+					26
 				],
 				"Weapon" : 
 				{
@@ -316,8 +316,8 @@
 				"Health" : 75,
 				"Position" : 
 				[
-					14,
-					20
+					20,
+					21
 				],
 				"Weapon" : 
 				{
@@ -389,8 +389,8 @@
 				"Health" : 100,
 				"Position" : 
 				[
-					95,
-					12
+					97,
+					15
 				],
 				"Weapon" : 
 				{
@@ -420,14 +420,18 @@
 			"PersistanceType" : 0,
 			"Position" : 
 			[
-				4,
-				6
+				-1,
+				-1
 			],
 			"Statistics" : 
 			[
 				{
 					"Type" : 1,
-					"Value" : 2.0
+					"Value" : 10.0
+				},
+				{
+					"Type" : 2,
+					"Value" : 30.0
 				}
 			]
 		},
@@ -447,22 +451,6 @@
 					{
 						"Type" : 0,
 						"Value" : 20.0
-					}
-				]
-			},
-			{
-				"ItemType" : 1,
-				"PersistanceType" : 0,
-				"Position" : 
-				[
-					29,
-					1
-				],
-				"Statistics" : 
-				[
-					{
-						"Type" : 0,
-						"Value" : 7.0
 					}
 				]
 			},
@@ -487,26 +475,38 @@
 				"PersistanceType" : 0,
 				"Position" : 
 				[
-					-1,
-					-1
+					4,
+					6
 				],
 				"Statistics" : 
 				[
 					{
 						"Type" : 1,
-						"Value" : 10.0
-					},
+						"Value" : 2.0
+					}
+				]
+			},
+			{
+				"ItemType" : 1,
+				"PersistanceType" : 0,
+				"Position" : 
+				[
+					29,
+					1
+				],
+				"Statistics" : 
+				[
 					{
-						"Type" : 2,
-						"Value" : 30.0
+						"Type" : 0,
+						"Value" : 7.0
 					}
 				]
 			}
 		],
 		"Position" : 
 		[
-			45,
-			9
+			59,
+			10
 		],
 		"Weapon" : 
 		{
