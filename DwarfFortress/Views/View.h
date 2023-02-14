@@ -97,6 +97,7 @@ public:
         }
 
         DrawStatusChanges();
+        DrawActionText("1-Weapon Change, 2-Armor Change, 3-Drink Consumable, F1-Save, F2-Load");
     }
 
     void DrawChanges(std::vector<EnvironmentChange> environmentChanges)
@@ -181,9 +182,18 @@ public:
             }
         }
             
-        ClearRow(_statusPosition);
+        ClearRow(_statusPosition, {_statusLength, 0});
         SetConsoleCursorPosition(ConsoleScreenHandle, _statusPosition);
         std::cout << "Health: " << health << " | Damage: " << damage << " | Armor: " << armor;
+    }
+
+    void DrawActionText(std::string newActionText)
+    {
+        AppendToActionText(newActionText);
+        
+        const COORD actionTextPosition { static_cast<short>(Dimensions.X - _actionText.size()), static_cast<short>(Dimensions.Y) };
+        SetConsoleCursorPosition(ConsoleScreenHandle, actionTextPosition);
+        std::cout << _actionText;
     }
     
     void Clear() {
@@ -201,18 +211,36 @@ public:
         SetConsoleCursorPosition(ConsoleScreenHandle, topLeft);
     }
 
-    void ClearRow(COORD rowStart)
+    void ClearRow(COORD rowStart, COORD rowEnd = {-1, -1})
     {
+        if (rowEnd.X == -1)
+            rowEnd.X = ConsoleScreenInfo.dwSize.X;
+        
         DWORD written;
         GetConsoleScreenBufferInfo(ConsoleScreenHandle, &ConsoleScreenInfo);
         FillConsoleOutputCharacterA(
-            ConsoleScreenHandle, ' ', ConsoleScreenInfo.dwSize.X, rowStart, &written
+            ConsoleScreenHandle, ' ',
+            ConsoleScreenInfo.dwSize.X - (ConsoleScreenInfo.dwSize.X - rowEnd.X), rowStart, &written
         );
         FillConsoleOutputAttribute(
             ConsoleScreenHandle, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
-            ConsoleScreenInfo.dwSize.X, rowStart, &written
+            ConsoleScreenInfo.dwSize.X - (ConsoleScreenInfo.dwSize.X - rowEnd.X), rowStart, &written
         );
     }
 private:
     COORD _statusPosition {0, 29};
+    short _statusLength = 40;
+    short _actionTextLength = 80;
+    std::string _actionText;
+
+    void AppendToActionText(std::string newActionText)
+    {
+        _actionText.append(" " + newActionText);
+
+        if (_actionText.size() > _actionTextLength)
+        {
+            _actionText = _actionText.substr(_actionText.size() - _actionTextLength, _actionText.size());
+            _actionText[0] = _actionText[1] = _actionText[2] = '.';
+        }
+    }
 };

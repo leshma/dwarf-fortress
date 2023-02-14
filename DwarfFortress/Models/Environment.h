@@ -26,6 +26,7 @@ public:
 
     boost::signals2::signal<void (std::vector<EnvironmentChange>)> SignalEnvironmentChanged;
     boost::signals2::signal<void ()> SignalStatusChanged;
+    boost::signals2::signal<void (std::string)> SignalActionTextChanged;
 
     Environment(Coordinates dimensions, std::vector<std::shared_ptr<Object>> environmentObjects,
         std::vector<std::shared_ptr<Room>> environmentRooms)
@@ -132,6 +133,8 @@ public:
                     player->Inventory->ContainedItems.push_back(player->Inventory->Weapon);
                     player->Inventory->Weapon = player->Inventory->ContainedItems[i];
                     player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
+
+                    SignalActionTextChanged("Weapon changed!");
                 }
                 break;
             case VK_2: // Key "2" from https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
@@ -151,6 +154,8 @@ public:
                     player->Inventory->ContainedItems.push_back(player->Inventory->Armor);
                     player->Inventory->Armor = player->Inventory->ContainedItems[i];
                     player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
+
+                    SignalActionTextChanged("Armor changed!");
                 }
                 break;
             case VK_3:
@@ -167,14 +172,18 @@ public:
 
                     if (i >= player->Inventory->ContainedItems.size()) break;
 
+                    int restoredHealth = 0;
                     for (const auto statistic : player->Inventory->ContainedItems[i]->Statistics)
                     {
                         if (statistic->Type == HealthRestore)
                         {
                             player->Health += static_cast<int>(statistic->Value);
+                            restoredHealth += static_cast<int>(statistic->Value);
                         }
                     }
                     player->Inventory->ContainedItems.erase(player->Inventory->ContainedItems.begin() + i);
+
+                    SignalActionTextChanged("Health potion consumed! Restored " + std::to_string(restoredHealth) + " health.");
                 }
                 break;
             // If the player accidentally pressed a button or similar...
@@ -228,30 +237,36 @@ public:
                             if (player->Inventory->Weapon == nullptr)
                             {
                                 player->Inventory->Weapon = item;
+                                SignalActionTextChanged("Picked up and equipped a weapon.");
                             }
                             else
                             {
                                 player->Inventory->ContainedItems.push_back(item);
+                                SignalActionTextChanged("Picked up a weapon.");
                             }
                             break;
                         case TArmor:
                             if (player->Inventory->Armor == nullptr)
                             {
                                 player->Inventory->Armor = item;
+                                SignalActionTextChanged("Picked up and equipped an armor.");
                             }
                             else
                             {
                                 player->Inventory->ContainedItems.push_back(item);
+                                SignalActionTextChanged("Picked up an armor.");
                             }
                             break;
                         default:
                             player->Inventory->ContainedItems.push_back(item);
+                            SignalActionTextChanged("Picked up an item.");
                             break;
                         }
                     }
                     else
                     {
                         player->Inventory->ContainedItems.push_back(item);
+                        SignalActionTextChanged("Picked up an item.");
                     }
             
                     changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {playerObject->Position.X, playerObject->Position.Y}, true, false));
@@ -267,25 +282,41 @@ public:
                     std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(playerObject);
                     std::shared_ptr<Enemy> enemy = std::dynamic_pointer_cast<Enemy>(object);
 
+                    SignalActionTextChanged("Hit an enemy!");
                     bool killedEnemy = Combat::PlayerHitsEnemy(player, enemy);
                     if (killedEnemy)
                     {
-                        // Take all items
-                        player->Inventory->ContainedItems.insert(player->Inventory->ContainedItems.end(), enemy->DroppableItems.begin(), enemy->DroppableItems.end());
+                        SignalActionTextChanged("Killed an enemy!");
 
+                        if (!enemy->DroppableItems.empty())
+                        {
+                            // Take all items
+                            player->Inventory->ContainedItems.insert(player->Inventory->ContainedItems.end(), enemy->DroppableItems.begin(), enemy->DroppableItems.end());
+
+                            SignalActionTextChanged("Picked up items the enemy has dropped.");
+                        }
+                        
                         // Remove the enemy
                         int i = 0;
-                        while (EnemyPositions[i].X != object->Position.X && EnemyPositions[i].Y != object->Position.Y)
+                        while (i < EnemyPositions.size())
                         {
+                            if (EnemyPositions[i].X == object->Position.X &&
+                                EnemyPositions[i].Y == object->Position.Y) break;
                             ++i;
                         }
-                        EnemyPositions.erase(EnemyPositions.begin() + i);
+
+                        if (i < EnemyPositions.size())
+                            EnemyPositions.erase(EnemyPositions.begin() + i);
                         
                         changes.push_back(EnvironmentChange({object->Position.X, object->Position.Y}, {playerObject->Position.X, playerObject->Position.Y}, true, false));
                         object.reset(new Object(object->Position, TNothing));
                         std::swap(object, playerObject);
 
                         moved = true;
+                    }
+                    else
+                    {
+                        SignalActionTextChanged("[Enemy HP: " + std::to_string(enemy->Health) + "]");
                     }
                 }
         }
@@ -332,7 +363,9 @@ public:
 
             if (killedPlayer)
             {
-                exit(-1);
+                SignalActionTextChanged("You've died! Game over. Press enter to exit.");
+                getchar();
+                exit(0);
             }
             
             return changes;

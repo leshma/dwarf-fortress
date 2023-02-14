@@ -2,22 +2,6 @@
 	"Items" : 
 	[
 		{
-			"ItemType" : 1,
-			"PersistanceType" : 0,
-			"Position" : 
-			[
-				29,
-				1
-			],
-			"Statistics" : 
-			[
-				{
-					"Type" : 0,
-					"Value" : 7.0
-				}
-			]
-		},
-		{
 			"ItemType" : 2,
 			"PersistanceType" : 1,
 			"Position" : 
@@ -58,123 +42,8 @@
 				"Health" : 50,
 				"Position" : 
 				[
-					24,
-					12
-				],
-				"Weapon" : 
-				{
-					"ItemType" : 0,
-					"PersistanceType" : 0,
-					"Position" : 
-					[
-						-1,
-						-1
-					],
-					"Statistics" : 
-					[
-						{
-							"Type" : 0,
-							"Value" : 5.0
-						}
-					]
-				}
-			},
-			{
-				"Health" : 40,
-				"Position" : 
-				[
-					19,
-					5
-				],
-				"Weapon" : 
-				{
-					"ItemType" : 0,
-					"PersistanceType" : 0,
-					"Position" : 
-					[
-						-1,
-						-1
-					],
-					"Statistics" : 
-					[
-						{
-							"Type" : 0,
-							"Value" : 5.0
-						}
-					]
-				}
-			},
-			{
-				"Armor" : 
-				{
-					"ItemType" : 1,
-					"PersistanceType" : 0,
-					"Position" : 
-					[
-						-1,
-						-1
-					],
-					"Statistics" : 
-					[
-						{
-							"Type" : 1,
-							"Value" : 10.0
-						}
-					]
-				},
-				"DroppableItems" : 
-				[
-					{
-						"ItemType" : 1,
-						"PersistanceType" : 0,
-						"Position" : 
-						[
-							-1,
-							-1
-						],
-						"Statistics" : 
-						[
-							{
-								"Type" : 1,
-								"Value" : 10.0
-							},
-							{
-								"Type" : 2,
-								"Value" : 30.0
-							}
-						]
-					}
-				],
-				"Health" : 80,
-				"Position" : 
-				[
-					39,
-					11
-				],
-				"Weapon" : 
-				{
-					"ItemType" : 0,
-					"PersistanceType" : 0,
-					"Position" : 
-					[
-						-1,
-						-1
-					],
-					"Statistics" : 
-					[
-						{
-							"Type" : 0,
-							"Value" : 15.0
-						}
-					]
-				}
-			},
-			{
-				"Health" : 50,
-				"Position" : 
-				[
-					64,
-					3
+					61,
+					1
 				],
 				"Weapon" : 
 				{
@@ -198,8 +67,8 @@
 				"Health" : 50,
 				"Position" : 
 				[
-					73,
-					17
+					66,
+					19
 				],
 				"Weapon" : 
 				{
@@ -224,7 +93,7 @@
 				"Position" : 
 				[
 					40,
-					26
+					24
 				],
 				"Weapon" : 
 				{
@@ -248,7 +117,7 @@
 				"Health" : 30,
 				"Position" : 
 				[
-					44,
+					55,
 					27
 				],
 				"Weapon" : 
@@ -273,7 +142,7 @@
 				"Health" : 70,
 				"Position" : 
 				[
-					76,
+					65,
 					25
 				],
 				"Weapon" : 
@@ -321,8 +190,8 @@
 				"Health" : 40,
 				"Position" : 
 				[
-					79,
-					26
+					77,
+					27
 				],
 				"Weapon" : 
 				{
@@ -382,8 +251,8 @@
 				"Health" : 75,
 				"Position" : 
 				[
-					11,
-					21
+					22,
+					20
 				],
 				"Weapon" : 
 				{
@@ -447,7 +316,7 @@
 				"Health" : 75,
 				"Position" : 
 				[
-					13,
+					14,
 					20
 				],
 				"Weapon" : 
@@ -520,8 +389,8 @@
 				"Health" : 100,
 				"Position" : 
 				[
-					100,
-					6
+					95,
+					12
 				],
 				"Weapon" : 
 				{
@@ -562,9 +431,41 @@
 				}
 			]
 		},
-		"Health" : 97,
+		"Health" : 42,
 		"Items" : 
 		[
+			{
+				"ItemType" : 0,
+				"PersistanceType" : 0,
+				"Position" : 
+				[
+					4,
+					4
+				],
+				"Statistics" : 
+				[
+					{
+						"Type" : 0,
+						"Value" : 20.0
+					}
+				]
+			},
+			{
+				"ItemType" : 1,
+				"PersistanceType" : 0,
+				"Position" : 
+				[
+					29,
+					1
+				],
+				"Statistics" : 
+				[
+					{
+						"Type" : 0,
+						"Value" : 7.0
+					}
+				]
+			},
 			{
 				"ItemType" : 2,
 				"PersistanceType" : 1,
@@ -582,26 +483,30 @@
 				]
 			},
 			{
-				"ItemType" : 0,
+				"ItemType" : 1,
 				"PersistanceType" : 0,
 				"Position" : 
 				[
-					4,
-					4
+					-1,
+					-1
 				],
 				"Statistics" : 
 				[
 					{
-						"Type" : 0,
-						"Value" : 20.0
+						"Type" : 1,
+						"Value" : 10.0
+					},
+					{
+						"Type" : 2,
+						"Value" : 30.0
 					}
 				]
 			}
 		],
 		"Position" : 
 		[
-			41,
-			2
+			45,
+			9
 		],
 		"Weapon" : 
 		{

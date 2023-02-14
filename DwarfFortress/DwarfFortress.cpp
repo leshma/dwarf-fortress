@@ -14,7 +14,6 @@ int main()
 {
     /*
      *  TODO:
-     *  - Ispisivati podatke prilikom akcija (Pokupljen taj i taj item, napadnut neprijatelj sa tolko i tolko helta, ...)
      *  - Prebaciti sve iz .h u .cpp
      *  - Optimizovati šta se može
      *  - Istestirati sve
@@ -31,9 +30,13 @@ int main()
         KeyboardController keyboardController;
 
         view.InitialDraw();
+
         environment->SignalEnvironmentChanged.connect(bind(&View::DrawEnvironmentChanges, &view, _1));
         environment->SignalStatusChanged.connect(bind(&View::DrawStatusChanges, &view));
+        environment->SignalActionTextChanged.connect(bind(&View::DrawActionText, &view, _1));
+        
         keyboardController.SignalKeyboardPress.connect(bind(&Environment::MoveTick, environment, _1));
+        keyboardController.SignalActionTextChanged.connect(bind(&View::DrawActionText, &view, _1));
 
         do
         {
